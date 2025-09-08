@@ -127,7 +127,6 @@ class LinearSystem(BaseSystem):
              u: np.array
              ) -> None:
         self._get_disturbance()
-        print(f"X : {self.x} \n u : {u} \n dis : {self.phi} system")
         self.x += u + self.phi
     
     def mpc_step(self,

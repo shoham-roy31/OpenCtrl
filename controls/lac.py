@@ -1,5 +1,6 @@
 import numpy as np
 from .control_schema import ControlSchema
+from verbose_cli.cli import make_table
 from optim.optimizer_schema import OptimizerSchema
 from SystemDynamicExample.base_sys import BaseSystem
 from typing import List, Tuple,Optional,Literal
@@ -83,7 +84,6 @@ class LAC(ControlSchema):
              verbose : Optional[bool] = False
              ) -> Tuple[np.ndarray]:
         assert_params(**locals())
-        #print(f"LEN PRED : {len(preds)}")
         if not len(preds) == self.horizon:
             raise ValueError(f"horizon: {self.horizon} is not equal with preds : {len(preds)}")
         if all(np.shape(_)[0] != self.system.disturbance_dim  for _ in preds):
@@ -97,7 +97,6 @@ class LAC(ControlSchema):
         if not self.window:
             self.window = [np.array([window_init for _ in range(self.system.sys_dim)]) for _ in range(window_size)] \
                  if window_auto else manual_window
-            print(f"Window init : {self.window}")
         self.prev_ema = np.zeros(self.system.sys_dim)
         self.prev_real = np.zeros(self.system.sys_dim)
         self.nominal = self._wrapper_disturbance(self.horizon,
@@ -115,8 +114,6 @@ class LAC(ControlSchema):
         
         for _ in range(self.horizon):
             blended.append(self.psi*preds[_] + (1 - self.psi)*self.nominal[_])
-        print(f"PSI : {self.psi} \n NOMINAL : {self.nominal}")
-        print(f"BLENDED :{blended}")
         cost,u = self.optim.optimize(blended,
                                  verbose)
         self.system.step(u[0])
@@ -125,9 +122,15 @@ class LAC(ControlSchema):
         self.prev_ema = self.nominal[-1]
         self.prev_real = self.system.phi
         self.window.pop(0)
-        print(f"window phi: {self.system.phi}")
         self.window.append(self.system.phi)
-        print(f"window: {self.window}")
+        if verbose:
+            display_stack = [[np.round(inp,3),np.round(c,3),np.round(b,3),np.round(n,3),np.round(self.psi,4)] for inp, c, 
+                             b,n in zip(u,cost,blended, self.nominal)]
+            display_header = ['U','COST','BLENDED','NOMINAL','PSI'] 
+            temp = make_table(display_header,display_stack)
+            display_stack = [[self.system.x,self.system.phi,temp]]
+            display_header = ['X', 'Phi', 'DETAILS'] 
+            print(make_table(display_header,display_stack)+'\n')
         return cost,u
     
     def dcl(self) -> None:
@@ -142,17 +145,12 @@ class LAC(ControlSchema):
             T = np.arange(start= 0,
                           stop= self.counter) * np.ones_like(eMl)
             return self.rho * T * (self.psi * delta(eMl,eNo) + eNo)
-        print(f'ERROR_QUEUE : {self.error_queue}')
         eMl = np.array([e for e_ in self.error_queue for e in e_[0]])
         eNo = np.array([e for e_ in self.error_queue for e in e_[1]])
         eMl = np.sum(eMl, axis = 0)
         eNo = np.sum(eNo, axis = 0)
         v = V(eMl,eNo)
-        print(f"SHAPE of V : {np.shape(v)} and Counter : {self.counter} eML : {eMl} and eNo : {eNo}")
-        print(f"The numerator : {(2 * np.dot(delta(eMl,eNo).T ,v))}")
-        print(f"denominatior : {np.linalg.norm(v,ord = 2)}")
         self.psi -= (2 * np.dot(delta(eMl,eNo).T ,v)) / \
                     (np.linalg.norm(v,ord = 2) + 0.03)
-        print(f"PSI before clip : {self.psi}")
+
         self.psi = np.clip(self.psi, 0 , 1)
-        print(f"CHANGED PSI HERE! : {np.shape(self.psi)}")

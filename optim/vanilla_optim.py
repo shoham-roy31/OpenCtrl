@@ -76,13 +76,11 @@ class VanillaOptim(OptimizerSchema):
         if len(preds) != self.horizon:
             raise ValueError(f"Predictions must have length equal to the horizon ({self.horizon}) but got {len(preds)}.")
         x = self.system.x
-        #print(f"Xo - {x}")
         U = []
         C = []
         for horizon in range(self.horizon):
             x = self.project(x, preds[horizon])
             cost, u = self.optim(x, verbose, horizon)
-            #print(f"Cost Metrics : {cost} \n input - {x} \n output - {u} \n input_mask : {self.input_space_mask}")
             x = self.system.mpc_step(u,preds[horizon])
             U.append(u)
             C.append(cost)
@@ -141,8 +139,6 @@ class VanillaOptim(OptimizerSchema):
                                                                     for u in self.system.u])
         self.input_space_mask = np.where(u == 0, 0, 1 ).astype(float) if self.input_space_mask is None\
                                 else self.input_space_mask
-        
-        #print(f"_get_random_u : {u}")
         return u
     
     def _clip_u(self, 

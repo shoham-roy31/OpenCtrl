@@ -13,7 +13,7 @@ def _test_lac_1() -> None:
     optimizer = VanillaOptim(system = system,
                                     horizon = 5,
                                     cost_function = 'quadratic',
-                                    optimizer_type = 'genetic',
+                                    optimizer_type = 'gradient',
                                     alpha = 0.01,
                                     max_iterations = 10,
                                     tolerance = 1e-3,
@@ -30,15 +30,7 @@ def _test_lac_1() -> None:
                                     np.array([1.0, 0.0, 0.0]),
                                     np.array([1.0, 0.0, 0.0])],
                           verbose= True)
-        print("__________________".center(50))
-        print(f"For {_} Cost: {cost} \n u: {u} \n")
+
 
 if __name__ == "__main__":
     _test_lac_1()
-
-
-# [np.array([1.0, 2.0, 3.0]),
-#                                     np.array([0.5, 1.5, 2.5]),
-#                                     np.array([ 42., -50., -50.]),
-#                                     np.array([ 42., -50., -50.]),
-#                                     np.array([ 42., -50., -50.])]

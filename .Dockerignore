@@ -18,6 +18,10 @@ venv/
 .idea/
 *.swp
 
+# Git
+.git/
+.gitignore
+
 # OS files
 .DS_Store
 Thumbs.db

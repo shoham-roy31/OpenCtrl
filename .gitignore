@@ -1,6 +1,6 @@
 # Python
-OpenCtrlEnv/
-__pycache__/
+OpenCtrlEnv
+__pycache__
 .pytest_cache/
 *.pyc
 *.pyo
@@ -26,8 +26,6 @@ Thumbs.db
 # Logs
 *.log
 
-# Dockerignore
-.Dockerignore
 
 # Build files
 dist/

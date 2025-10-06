@@ -22,7 +22,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: gcr.io
-          usename: ${{ github.actor }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract Docker image metadata
         id: meta

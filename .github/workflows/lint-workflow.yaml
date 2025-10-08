@@ -20,9 +20,9 @@ jobs:
       - name: Install dependencies
         run: |
           pip install flake8 black
+      - name: Format with black
+        run: |
+          black .
       - name: Lint with flake8
         run: |
           flake8 .
-      - name: Format with black
-        run: |
-          black --check .

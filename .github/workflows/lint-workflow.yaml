@@ -19,10 +19,13 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: |
-          pip install flake8 black isort autoflake
+          pip install flake8 black isort autoflake pycodestyle autopep8 
       - name: autoflake
         run: |
           autoflake --in-place --remove-all-unused-imports --recursive .
+      - name: autopep8
+        run: |
+          autopep8 --in-place --recursive --aggressive .
       - name: Sort import with isort
         run: |
           isort .

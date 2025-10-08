@@ -8,5 +8,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
 
 # EXECUTABLE
-RUN CHMOD +x ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 ENTRYPOINT [ "/app/entrypoint.sh" ]

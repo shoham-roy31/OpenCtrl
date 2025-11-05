@@ -1,6 +1,5 @@
 name: Test Workflow
 on: workflow_call
-
 jobs:
   test:
     runs-on: ubuntu-latest

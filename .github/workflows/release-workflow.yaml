@@ -1,0 +1,101 @@
+name: release
+on:
+  push:
+    tag:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-a[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-b[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
+  
+env:
+  PACKAGE_NAME: "OpenCtrl"
+  OWNER: "shoham-roy31"
+
+jobs:
+  test:
+    uses: shoham-roy31/OpenCtrl/.github/workflows/test-workflow.yaml@main
+  # lint:
+  #   needs: test
+  #   uses: shoham-roy31/OpenCtrl/.github/workflows/lint-workflow.yaml@main
+  details:
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    outputs:
+      new_version: ${{ steps.get_version.outputs.new_version }}
+      suffix: ${{ steps.release.outputs.suffix }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Chek Ref type
+        if: github.ref_type != 'tag'
+        run: |
+          echo "This is not a tag; exiting"; exit 1
+
+      - name: Extract tag and details
+        id: release
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
+          SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "stable")
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "suffix=$SUFFIX" >> $GITHUB_OUTPUT
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+      
+      - name: Debug outputs
+        if: env.RUNNER_DEBUG == 'true'
+        run: |
+          echo "Version is $NEW_VERSION"
+          echo "Suffix is $SUFFIX"
+          echo "Tag name is $TAG_NAME"
+  check_pypi_docker:
+    needs: details
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch information from check_pypi
+        run: |
+          response=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json || echo "{}")
+          latest_previous_version=$(echo $response | grep -oP '"releases":\{"\K[^"]+' | sort -rV | head -n 1)
+          if [ -z "$latest_previous_version" ]; then
+            echo "Package not found on PyPI."
+            latest_previous_version="0.0.0"
+          fi
+          echo "Latest version on PyPI: $latest_previous_version"
+          echo "latest_previous_version=$latest_previous_version" >> $GITHUB_ENV
+      - name : Compare versions and exit if not newer
+        run: |
+          NEW_VERSION=${{ needs.details.outputs.new_version }}
+          LATEST_VERSION=$latest_previous_version
+          if [ "$(printf '%s\n' "$LATEST_VERSION" "$NEW_VERSION" | sort -V | head -n 1)" != "$NEW_VERSION"] || [ "$LATEST_VERSION" == "$NEW_VERSION" ]; then
+            echo "The new version $NEW_VERSION is not greater than the latest version $LATEST_VERSION on PyPI"
+            exit 1
+          else
+            echo "The new version $NEW_VERSION is greater than the latest version $LATEST_VERSION on PyPI"
+          fi
+      - name: Get versions in docker tags
+        run: |
+          NEW_VERSION=${{ needs.details.outputs.new_version }}
+          LATEST_DOCKER_VERSION=$(curl -s https://hub.docker.com/v2/repositories/${{ env.OWNER }}/${{ env.PACKAGE_NAME }}/tags/?page_size=100 | grep -oP '"name":"\K[^"]+' | sort -rV | head -n 1 || echo "")
+          if [ -z "$LATEST_DOCKER_VERSION" ]; then
+            echo "No tags found in Docker Hub"
+            LATEST_DOCKER_VERSION="0.0.0"
+          fi
+          echo "Latest Docker tag version: $LATEST_DOCKER_VERSION"
+          echo "latest_docker_version=$LATEST_DOCKER_VERSION" >> $GITHUB_OUTPUT
+      - name: Compare docker versions and exit if not newer
+        run: |
+          NEW_VERSION=${{ needs.details.outputs.new_version }}
+          LATEST_DOCKER_VERSION=${{ steps.get_docker_version.outputs.latest_docker_version }}
+          if [ "$(printf '%s\n' "$LATEST_DOCKER_VERSION" "$NEW_VERSION" | sort -V | head -n 1)" != "$NEW_VERSION"] || [ "$LATEST_DOCKER_VERSION" == "$NEW_VERSION" ]; then
+            echo "The new version $NEW_VERSION is not greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
+            echo "should_build=false" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
+            echo "should_build=true" >> $GITHUB_OUTPUT
+          fi
+  build_and_publish:
+    needs: [details, check_pypi_docker]
+    if: needs.check_pypi_docker.outputs.should_build == 'true'
+    uses: shoham-roy31/OpenCtrl/.github/workflows/build-workflow.yaml
+
+
+    

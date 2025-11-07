@@ -98,10 +98,14 @@ jobs:
             echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
             echo "should_build=true" >> "$GITHUB_OUTPUT"
           fi
-  # build_and_publish:
-  #   needs: [check_pypi_docker]
-  #   if: ${{ needs.check_pypi_docker.outputs.should_build }} == "true"
-  #   uses: ./.github/workflows/build-workflow.yaml
+  build_and_publish:
+    needs: [check_pypi_docker]
+    if: ${{ needs.check_pypi_docker.outputs.should_build }} == "true"
+    uses: ./.github/workflows/build-workflow.yaml
+    secrets:
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    with:
+      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
 
 
-    
+

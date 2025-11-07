@@ -37,9 +37,9 @@ jobs:
           TAG_NAME=${GITHUB_REF#refs/tags/}
           NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
           SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "stable")
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "suffix=$SUFFIX" >> $GITHUB_OUTPUT
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
           echo "New Version $NEW_VERSION with Suffix $SUFFIX from Tag $TAG_NAME"
       
       - name: Debug outputs
@@ -82,18 +82,18 @@ jobs:
             LATEST_DOCKER_VERSION="0.0.0"
           fi
           echo "Latest Docker tag version: $LATEST_DOCKER_VERSION"
-          echo "latest_docker_version=$LATEST_DOCKER_VERSION" >> $GITHUB_OUTPUT
+          echo "latest_docker_version=$LATEST_DOCKER_VERSION" >> "$GITHUB_OUTPUT"
       - name: Compare docker versions and exit if not newer
         run: |
           NEW_VERSION=${{ needs.details.outputs.new_version }}
           LATEST_DOCKER_VERSION=${{ steps.get_docker_version.outputs.latest_docker_version }}
           if [ "$(printf '%s\n' "$LATEST_DOCKER_VERSION" "$NEW_VERSION" | sort -V | head -n 1)" != "$NEW_VERSION"] || [ "$LATEST_DOCKER_VERSION" == "$NEW_VERSION" ]; then
             echo "The new version $NEW_VERSION is not greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
-            echo "should_build=false" >> $GITHUB_OUTPUT
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
             exit 1
           else
             echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
-            echo "should_build=true" >> $GITHUB_OUTPUT
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
           fi
   build_and_publish:
     needs: [check_pypi_docker]

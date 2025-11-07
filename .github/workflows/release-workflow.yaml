@@ -28,6 +28,7 @@ jobs:
       - name: Chek Ref type
         if: github.ref_type != 'tag'
         run: |
+          echo "Passed tag is $github.ref_type"
           echo "This is not a tag; exiting"; exit 1
 
       - name: Extract tag and details

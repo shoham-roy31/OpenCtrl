@@ -76,6 +76,7 @@ jobs:
         run: |
           NEW_VERSION=${{ needs.details.outputs.new_version }}
           LATEST_DOCKER_VERSION=$(curl -s https://hub.docker.com/v2/repositories/${{ env.OWNER }}/${{ env.PACKAGE_NAME }}/tags/?page_size=100 | grep -oP '"name":"\K[^"]+' | sort -rV | head -n 1 || echo "")
+          echo "Fetched latest docker tag version: $LATEST_DOCKER_VERSION"
           if [ -z "$LATEST_DOCKER_VERSION" ]; then
             echo "No tags found in Docker Hub"
             LATEST_DOCKER_VERSION="0.0.0"

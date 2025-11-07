@@ -102,10 +102,6 @@ jobs:
     needs: [check_pypi_docker]
     if: ${{ needs.check_pypi_docker.outputs.should_build }} == "true"
     uses: ./.github/workflows/build-workflow.yaml
-    secrets:
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     with:
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-
-
-

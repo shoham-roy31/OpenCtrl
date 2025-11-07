@@ -37,9 +37,9 @@ jobs:
           TAG_NAME=${GITHUB_REF#refs/tags/}
           NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
           SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "stable")
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "suffix=$SUFFIX" >> $GITHUB_OUTPUT
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          echo "suffix=${SUFFIX}" >> $GITHUB_OUTPUT
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
           echo "New Version $NEW_VERSION with Suffix $SUFFIX from Tag $TAG_NAME"
       
       - name: Debug outputs

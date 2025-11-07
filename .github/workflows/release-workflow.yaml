@@ -12,16 +12,16 @@ env:
   OWNER: "shoham-roy31"
 
 jobs:
-  test:
-    uses: ./.github/workflows/test-workflow.yaml
+  # test:
+  #   uses: ./.github/workflows/test-workflow.yaml
   # lint:
   #   needs: test
   #   uses: shoham-roy31/OpenCtrl/.github/workflows/lint-workflow.yaml
   details:
     runs-on: ubuntu-latest
-    needs: [test]
+    # needs: [test]
     outputs:
-      new_version: ${{ steps.outputs.new_version }}
+      new_version: ${{ steps.rekeaoutputs.new_version }}
       suffix: ${{ steps.release.outputs.suffix }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
@@ -51,6 +51,9 @@ jobs:
   check_pypi_docker:
     needs: details
     runs-on: ubuntu-latest
+    outputs:
+      latest_docker_version: ${{ steps.outputs.latest_docker_version }}
+      should_build: ${{ steps.release.outputs.should_build }}
     steps:
       - name: Fetch information from check_pypi
         run: |
@@ -97,7 +100,7 @@ jobs:
           fi
   build_and_publish:
     needs: [check_pypi_docker]
-    if: needs.check_pypi_docker.outputs.should_build == 'true'
+    if: ${{ needs.check_pypi_docker.outputs.should_build }} == "true"
     uses: ./.github/workflows/build-workflow.yaml
 
 

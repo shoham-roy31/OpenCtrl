@@ -52,7 +52,8 @@ jobs:
     needs: details
     runs-on: ubuntu-latest
     outputs:
-      latest_docker_version: ${{ steps.outputs.latest_docker_version }}
+      latest_docker_version: ${{ steps.release.outputs.latest_docker_version }}
+      new_docker_version: ${{ steps.release.outputs.new_docker_version }}
       should_build: ${{ steps.release.outputs.should_build }}
     steps:
       - name: Fetch information from check_pypi
@@ -86,6 +87,7 @@ jobs:
           fi
           echo "Latest Docker tag version: $LATEST_DOCKER_VERSION"
           echo "latest_docker_version=$LATEST_DOCKER_VERSION" >> "$GITHUB_OUTPUT"
+          echo "new_docker_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
       - name: Compare docker versions and exit if not newer
         run: |
           NEW_VERSION=${{ needs.details.outputs.new_version }}
@@ -102,6 +104,8 @@ jobs:
     needs: [check_pypi_docker]
     if: ${{ needs.check_pypi_docker.outputs.should_build }} == "true"
     uses: ./.github/workflows/build-workflow.yaml
+    with:
+      image_tag: ${{ needs.check_pypi_docker.outputs.new_docker_version }}
     secrets:
       docker_username: ${{ vars.DOCKER_USERNAME }}
       docker_password: ${{ secrets.DOCKER_PASSWORD }}

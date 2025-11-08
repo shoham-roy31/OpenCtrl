@@ -103,7 +103,7 @@ jobs:
           fi
   build_and_publish:
     needs: [check_pypi_docker]
-    if: ${{ needs.check_pypi_docker.outputs.should_build }} == "true"
+    if: ${{ needs.check_pypi_docker.outputs.should_build }} == "false"
     uses: ./.github/workflows/build-workflow.yaml
     with:
       image_tag: ${{ needs.check_pypi_docker.outputs.new_docker_version }}

@@ -5,7 +5,7 @@ on:
       should_build:
         description: 'Whether to build the Docker image'
         required: true
-        type: string
+        type: bool
     secrets:
       docker_username:
         required: true

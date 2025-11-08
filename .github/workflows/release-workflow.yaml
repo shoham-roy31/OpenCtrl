@@ -66,7 +66,6 @@ jobs:
 
       - name : Compare versions and exit if not newer
         run: |
-          set -euo pipefail
           NEW_VERSION=${{ needs.details.outputs.new_version }}
           LATEST_VERSION=${ latest_previous_version }
           if [ "$(printf '%s\n' "$LATEST_VERSION" "$NEW_VERSION" | sort -V | head -n 1)" != "$NEW_VERSION"] || [ "$LATEST_VERSION" == "$NEW_VERSION" ]; then

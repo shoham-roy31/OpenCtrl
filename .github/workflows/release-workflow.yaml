@@ -106,10 +106,6 @@ jobs:
     uses: ./.github/workflows/build-workflow.yaml
     with:
       image_tag: ${{ needs.check_pypi_docker.outputs.new_docker_version }}
-      run: |
-        echo "Building and publishing Docker image for version ${{ needs.check_pypi_docker.outputs.should_build }}"
-        echo "Latest Docker version was ${{ needs.check_pypi_docker.outputs.latest_docker_version }}"
-        echo "New Docker version is ${{ needs.check_pypi_docker.outputs.new_docker_version }}"
     secrets:
       docker_username: ${{ vars.DOCKER_USERNAME }}
       docker_password: ${{ secrets.DOCKER_PASSWORD }}

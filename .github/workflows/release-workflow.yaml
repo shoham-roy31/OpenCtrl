@@ -107,7 +107,7 @@ jobs:
   build_and_publish:
     needs: [check_pypi_docker]
     uses: ./.github/workflows/build-workflow.yaml
-    inputs:
+    with:
       image_tag: ${{ needs.check_pypi_docker.outputs.new_version }}
       should_build: ${{ needs.check_pypi_docker.outputs.should_build }}
     secrets:

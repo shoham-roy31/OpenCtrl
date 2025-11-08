@@ -2,10 +2,6 @@ name: Docker Build
 on: 
   workflow_call:
     inputs:
-      image_tag:
-        description: 'Tag for the Docker Image'
-        required: true
-        type: string
       should_build:
         description: 'Whether to build the Docker image'
         required: true

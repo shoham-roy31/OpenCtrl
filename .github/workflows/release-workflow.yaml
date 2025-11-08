@@ -91,7 +91,7 @@ jobs:
       - name: Compare docker versions and exit if not newer
         run: |
           NEW_VERSION=${{ needs.details.outputs.new_version }}
-          LATEST_DOCKER_VERSION=${{ steps.check_pypi_docker.outputs.latest_docker_version }}
+          LATEST_DOCKER_VERSION=$latest_docker_version
           if [ "$(printf '%s\n' "$LATEST_DOCKER_VERSION" "$NEW_VERSION" | sort -V | head -n 1)" != "$NEW_VERSION"] || [ "$LATEST_DOCKER_VERSION" == "$NEW_VERSION" ]; then
             echo "The new version $NEW_VERSION is not greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
             echo "should_build=false" >> "$GITHUB_OUTPUT"
@@ -106,10 +106,10 @@ jobs:
             echo "should_build=true" >> $GITHUB_ENV
           fi
   build_and_publish:
-    needs: [check_pypi_docker]
+    needs: [details]
     uses: ./.github/workflows/build-workflow.yaml
     with:
-      image_tag: $new_docker_version
+      image_tag: ${{ needs.details.outputs.new_version }}
       should_build: true
     secrets:
       docker_username: ${{ vars.DOCKER_USERNAME }}

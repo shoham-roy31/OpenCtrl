@@ -110,7 +110,7 @@ jobs:
     uses: ./.github/workflows/build-workflow.yaml
     with:
       image_tag: $new_docker_version
-      should_build: $should_build
+      should_build: true
     secrets:
       docker_username: ${{ vars.DOCKER_USERNAME }}
       docker_password: ${{ secrets.DOCKER_PASSWORD }}

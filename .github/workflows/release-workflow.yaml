@@ -93,7 +93,7 @@ jobs:
             echo "should_build=false" >> "$GITHUB_OUTPUT"
           else
             echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
-            SHOULD_BUILD=true
+            SHOULD_BUILD="true"
             echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
           fi
   build_and_publish:

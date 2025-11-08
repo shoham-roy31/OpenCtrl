@@ -52,9 +52,7 @@ jobs:
     needs: details
     runs-on: ubuntu-latest
     outputs:
-      new_docker_version: ${{ steps.release.outputs.new_docker_version }}
       should_build: ${{ steps.release.outputs.should_build }}
-      latest_docker_version: ${{ steps.release.outputs.latest_docker_version }}
     steps:
       - name: Fetch information from check_pypi
         run: |
@@ -87,18 +85,16 @@ jobs:
           fi
           echo "Latest Docker tag version: $latest_docker_version"
           echo "latest_docker_version=$latest_docker_version" >> $GITHUB_ENV
-          echo "new_docker_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
       - name: Compare docker versions and exit if not newer
         run: |
           NEW_VERSION=${{ needs.details.outputs.new_version }}
           LATEST_DOCKER_VERSION=$latest_docker_version
           if [ "$(printf '%s\n' "$LATEST_DOCKER_VERSION" "$NEW_VERSION" | sort -V | head -n 1)" != "$NEW_VERSION"] || [ "$LATEST_DOCKER_VERSION" == "$NEW_VERSION" ]; then
             echo "The new version $NEW_VERSION is not greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
-            echo "should_build=false" >> "$GITHUB_OUTPUT"
             exit 1
           else
             echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
-            SHOULD_BUILD = true
+            SHOULD_BUILD = ${{ true }}
             echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
             echo "LATEST DOCKER VERSION : ${{ steps.check_pypi_docker.outputs.latest_docker_version }}"
             echo "SHOULD BUILD : ${{ steps.check_pypi_docker.outputs.should_build}}"

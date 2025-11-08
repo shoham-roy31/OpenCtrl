@@ -83,7 +83,7 @@ jobs:
             latest_docker_version="0.0.0"
           fi
           echo "latest_docker_version=$latest_docker_version" >> $GITHUB_ENV
-      - name: Compare docker versions and exit if not newer
+      - name: Compare docker versions and exit if not new
         id: docker
         run: |
           NEW_VERSION=${{ needs.details.outputs.new_version }}

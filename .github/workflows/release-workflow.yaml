@@ -31,7 +31,7 @@ jobs:
           echo "Passed tag is $github.ref_type"
           echo "This is not a tag; exiting"; exit 1
 
-      - name: Extract tag and details
+      - name: Extract tag and detail
         id: release
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}

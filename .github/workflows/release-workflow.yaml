@@ -52,9 +52,9 @@ jobs:
     needs: details
     runs-on: ubuntu-latest
     outputs:
-      latest_docker_version:  ${{ steps.release.outputs.latest_docker_version }}
-      new_version: ${{ steps.release.outputs.new_version }}
-      should_build:  ${{ steps.release.outputs.should_build }}
+      new_docker_version: ${{ steps.release.outputs.new_docker_version }}
+      should_build: ${{ steps.release.outputs.should_build }}
+      latest_docker_version: ${{ steps.release.outputs.latest_docker_version }}
     steps:
       - name: Fetch information from check_pypi
         run: |
@@ -98,7 +98,7 @@ jobs:
             exit 1
           else
             echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
-            echo "should_build='true'" >> "$GITHUB_OUTPUT"
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
             echo "LATEST DOCKER VERSION : ${{ steps.check_pypi_docker.outputs.latest_docker_version }}"
             echo "SHOULD BUILD : ${{ steps.check_pypi_docker.outputs.should_build}}"
             echo "NEW VERSION : ${{ steps.check_pypi_docker.outputs.new_version }}"
@@ -106,10 +106,10 @@ jobs:
           fi
   build_and_publish:
     needs: [check_pypi_docker]
-    if: ${{ needs.check_pypi_docker.outputs.should_build }} == 'false'
     uses: ./.github/workflows/build-workflow.yaml
-    with:
+    inputs:
       image_tag: ${{ needs.check_pypi_docker.outputs.new_version }}
+      should_build: ${{ needs.check_pypi_docker.outputs.should_build }}
     secrets:
       docker_username: ${{ vars.DOCKER_USERNAME }}
       docker_password: ${{ secrets.DOCKER_PASSWORD }}

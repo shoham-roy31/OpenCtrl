@@ -6,6 +6,10 @@ on:
         description: 'Tag for the Docker Image'
         required: true
         type: string
+      should_build:
+        description: 'Whether to build the Docker image'
+        required: true
+        type: boolean
     secrets:
       docker_username:
         required: true
@@ -17,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
+        if : ${{ inputs.should_build }} == false
         uses: actions/checkout@v3
       - name: Log in to Docker Hub
         uses: docker/login-action@v3

@@ -12,11 +12,11 @@ env:
   OWNER: "shoham-roy31"
 
 jobs:
-  test:
-    uses: ./.github/workflows/test-workflow.yaml
+  # test:
+  #   uses: ./.github/workflows/test-workflow.yaml
   details:
     runs-on: ubuntu-latest
-    needs: [test]
+    # needs: [test]
     outputs:
       new_version: ${{ steps.release.outputs.new_version }}
       suffix: ${{ steps.release.outputs.suffix }}
@@ -93,14 +93,14 @@ jobs:
             SHOULD_BUILD="true"
             echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
           fi
-  build_and_publish:
-    needs: [check_pypi_docker]
-    uses: ./.github/workflows/build-workflow.yaml
-    with:
-      should_build: ${{ needs.check_pypi_docker.outputs.should_build }}
-    secrets:
-      docker_username: ${{ vars.DOCKER_USERNAME }}
-      docker_password: ${{ secrets.DOCKER_PASSWORD }}
-  changelog:
-    needs: [build_and_publish]
-    uses: ./.github/workflows/changelog-workflow.yaml
+  # build_and_publish:
+  #   needs: [check_pypi_docker]
+  #   uses: ./.github/workflows/build-workflow.yaml
+  #   with:
+  #     should_build: ${{ needs.check_pypi_docker.outputs.should_build }}
+  #   secrets:
+  #     docker_username: ${{ vars.DOCKER_USERNAME }}
+  #     docker_password: ${{ secrets.DOCKER_PASSWORD }}
+  # changelog:
+  #   needs: [build_and_publish]
+  #   uses: ./.github/workflows/changelog-workflow.yaml

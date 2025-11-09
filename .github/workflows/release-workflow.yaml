@@ -93,14 +93,15 @@ jobs:
             echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
             SHOULD_BUILD="true"
             echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
-            echo "tag_release=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+            TAG_NAME=${{ needs.details.outputs.tag_name }}
+            echo "tag_release=$TAG_NAME" >> "$GITHUB_OUTPUT"
           fi
   github_release:
     name: Create GitHub Release
     needs: [check_pypi_docker]
     runs-on: ubuntu-latest
     env:
-      TAG_NAME: ${{ needs.check_pypi_docker.outputs.tag_releases }}
+      TAG_NAME: ${{ needs.check_pypi_docker.outputs.tag_release }}
     permissions:
       contents: write
     steps:

@@ -1,8 +1,6 @@
 name: Update Changelog Branch
 
-on:
-  release:
-    types: [published] # Trigger when a release is published
+on: workflow_call
 
 jobs:
   update_changelog:

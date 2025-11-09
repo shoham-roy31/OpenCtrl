@@ -101,3 +101,6 @@ jobs:
     secrets:
       docker_username: ${{ vars.DOCKER_USERNAME }}
       docker_password: ${{ secrets.DOCKER_PASSWORD }}
+  changelog:
+    needs: [build_and_publish]
+    uses: ./.github/workflows/changelog-workflow.yaml

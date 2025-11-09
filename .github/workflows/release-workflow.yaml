@@ -93,7 +93,7 @@ jobs:
             echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
             SHOULD_BUILD="true"
             echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
-            echo "tag_release=${{ needs.details.outputs.tag_name }}" >> "$GITHUB_OUTPUT"
+            echo "tag_release=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           fi
   github_release:
     name: Create GitHub Release

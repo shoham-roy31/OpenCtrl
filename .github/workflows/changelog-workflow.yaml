@@ -1,55 +1,48 @@
-# .github/workflows/update-changelog.yaml
-name: "Update Changelog"
+
+name: Update Changelog Branch
 
 on:
   release:
-    types: [released]
+    types: [published] # Trigger when a release is published
 
 jobs:
-  update:
+  update_changelog:
     runs-on: ubuntu-latest
 
-    permissions:
-      # Give the default GITHUB_TOKEN write permission to commit and push the 
-      # updated CHANGELOG back to the repository.
-      # https://github.blog/changelog/2023-02-02-github-actions-updating-the-default-github_token-permissions-to-read-only/
-      contents: write
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: main
 
-      - name: Extract release date
-        id: release_date
+      - name: Create Temporary Branch
         run: |
-          # get published_at (fallback to created_at) from the event payload
-          date=$(jq -r '.release.published_at // .release.created_at // empty' "$GITHUB_EVENT_PATH")
-          if [ -z "$date" ]; then
-            echo "date=" >> "$GITHUB_OUTPUT"
-          else
-            echo "date=$date" >> "$GITHUB_OUTPUT"
-          fi
+          git checkout -b update-changelog-${{ github.event.release.name }}
+          echo "BRANCH_NAME=update-changelog-${{ github.event.release.name }}" >> $GITHUB_ENV
 
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
-        id: changelog-updater
         with:
-          latest-version: ${{ github.event.release.tag_name }}
-          release-notes: ${{ github.event.release.body }}
-          release-date: ${{ steps.release_date.outputs.date }}
-          compare-url-target-revision: ${{ github.event.release.target_commitish }}
+          release-notes: ${{ github.event.release.body }} # Add release notes to changelog
+          latest-version: ${{ github.event.release.name }} # Add latest version to changelog
 
-      - name: Commit updated CHANGELOG
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          branch: ${{ github.event.release.target_commitish }}
-          commit_message: Update CHANGELOG
-          file_pattern: CHANGELOG.md
-
-      - name: Show changelog updater outputs
+      - name: Commit changes
         run: |
-          echo "release_compare_url=${{ steps.changelog-updater.outputs.release_compare_url }}"
-          echo "release_url_fragment=${{ steps.changelog-updater.outputs.release_url_fragment }}"
-          echo "unreleased_compare_url=${{ steps.changelog-updater.outputs.unreleased_compare_url }}"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "GitHub Actions"
+          git add CHANGELOG.md
+          git commit -m "Update Changelog for ${{ github.event.release.name }}"
+
+      - name: Push changes to temporary branch
+        run: |
+          git push origin HEAD:$BRANCH_NAME
+      # Step 3: Create the pull request using 'gh' command
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base main \
+            --head $BRANCH_NAME \
+            --title "Automated Pull Request from $BRANCH_NAME to main" \
+            --body "This is an automated pull request created via GitHub Actions."

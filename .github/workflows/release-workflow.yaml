@@ -93,6 +93,31 @@ jobs:
             SHOULD_BUILD="true"
             echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
           fi
+    github_release:
+    name: Create GitHub Release
+    needs: [check_pypi_docker]
+    runs-on: ubuntu-latest
+    env:
+      TAG_NAME: ${{ needs.details.outputs.tag_name }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history to avoid issues with tags and branches
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create GitHub Release
+        id: create_release
+        run: gh release create ${{ env.TAG_NAME }} dist/* --title ${{ env.TAG_NAME }} --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}
   # build_and_publish:
   #   needs: [check_pypi_docker]
   #   uses: ./.github/workflows/build-workflow.yaml

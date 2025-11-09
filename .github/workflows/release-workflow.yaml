@@ -109,15 +109,15 @@ jobs:
         with:
           fetch-depth: 0 # Fetch full history to avoid issues with tags and branches
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
+      # - name: Download artifacts
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: dist
+      #     path: dist/
 
       - name: Create GitHub Release
         id: create_release
-        run: gh release create ${{ env.TAG_NAME }} dist/* --title ${{ env.TAG_NAME }} --generate-notes
+        run: gh release create ${{ env.TAG_NAME }} --title ${{ env.TAG_NAME }} --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
   # build_and_publish:

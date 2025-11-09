@@ -36,7 +36,6 @@ jobs:
       - name: Push changes to temporary branch
         run: |
           git push origin HEAD:$BRANCH_NAME
-      # Step 3: Create the pull request using 'gh' command
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ github.token }}

@@ -1,7 +1,7 @@
 name: release
 on:
   push:
-    tag:
+    tags:
       - "[0-9]+.[0-9]+.[0-9]+"
       - "[0-9]+.[0-9]+.[0-9]+-a[0-9]+"
       - "[0-9]+.[0-9]+.[0-9]+-b[0-9]+"
@@ -50,6 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       should_build: ${{ steps.docker.outputs.should_build }}
+      tag_release: ${{ steps.docker.outputs.tag_release }}
     steps:
       - name: Fetch information from check_pypi
         run: |
@@ -92,13 +93,14 @@ jobs:
             echo "The new version $NEW_VERSION is greater than the latest Docker tag version $LATEST_DOCKER_VERSION"
             SHOULD_BUILD="true"
             echo "should_build=$SHOULD_BUILD" >> "$GITHUB_OUTPUT"
+            echo "tag_release=${{ needs.details.outputs.tag_name }}" >> "$GITHUB_OUTPUT"
           fi
-    github_release:
+  github_release:
     name: Create GitHub Release
     needs: [check_pypi_docker]
     runs-on: ubuntu-latest
     env:
-      TAG_NAME: ${{ needs.details.outputs.tag_name }}
+      TAG_NAME: ${{ needs.check_pypi_docker.outputs.tag_releases }}
     permissions:
       contents: write
     steps:

@@ -21,11 +21,25 @@ jobs:
         with:
           ref: ${{ github.event.release.target_commitish }}
 
+      - name: Extract release date
+        id: release_date
+        run: |
+          # get published_at (fallback to created_at) from the event payload
+          date=$(jq -r '.release.published_at // .release.created_at // empty' "$GITHUB_EVENT_PATH")
+          if [ -z "$date" ]; then
+            echo "date=" >> "$GITHUB_OUTPUT"
+          else
+            echo "date=$date" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
+        id: changelog-updater
         with:
           latest-version: ${{ github.event.release.tag_name }}
           release-notes: ${{ github.event.release.body }}
+          release-date: ${{ steps.release_date.outputs.date }}
+          compare-url-target-revision: ${{ github.event.release.target_commitish }}
 
       - name: Commit updated CHANGELOG
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -33,24 +47,9 @@ jobs:
           branch: ${{ github.event.release.target_commitish }}
           commit_message: Update CHANGELOG
           file_pattern: CHANGELOG.md
-      - name: Update Changelog
-        uses: stefanzweifel/changelog-updater-action@v1
-        id: "changelog-updater"
-        with:
-        # Pass extracted release date, release notes and version to the Action.
-        release-date: ${{ steps.release_date.outputs.date }}
-        release-notes: ${{ github.event.release.body }}
-        latest-version: ${{ github.event.release.tag_name }}
-        compare-url-target-revision: ${{ github.event.release.target_commitish }}
 
-      - name: "release_compare_url"
-        # https://github.com/org/repo/compare/v1.0.0...v1.1.0
-        run: "echo ${{ steps.changelog-updater.outputs.release_compare_url }}"
-
-      - name: "release_url_fragment"
-        # #v100---2021-02-01
-        run: "echo ${{ steps.changelog-updater.outputs.release_url_fragment }}"
-
-      - name: "unreleased_compare_url"
-        # https://github.com/org/repo/compare/v1.0.0...HEAD
-        run: "echo ${{ steps.changelog-updater.outputs.unreleased_compare_url }}"
+      - name: Show changelog updater outputs
+        run: |
+          echo "release_compare_url=${{ steps.changelog-updater.outputs.release_compare_url }}"
+          echo "release_url_fragment=${{ steps.changelog-updater.outputs.release_url_fragment }}"
+          echo "unreleased_compare_url=${{ steps.changelog-updater.outputs.unreleased_compare_url }}"

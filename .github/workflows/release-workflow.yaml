@@ -14,9 +14,6 @@ env:
 jobs:
   test:
     uses: ./.github/workflows/test-workflow.yaml
-  lint:
-    needs: test
-    uses: shoham-roy31/OpenCtrl/.github/workflows/lint-workflow.yaml
   details:
     runs-on: ubuntu-latest
     needs: [test]

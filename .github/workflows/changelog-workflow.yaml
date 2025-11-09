@@ -1,47 +1,35 @@
-
-name: Update Changelog Branch
+# .github/workflows/update-changelog.yaml
+name: "Update Changelog"
 
 on:
   release:
-    types: [published] # Trigger when a release is published
+    types: [released]
 
 jobs:
-  update_changelog:
+  update:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          ref: main
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the 
+      # updated CHANGELOG back to the repository.
+      # https://github.blog/changelog/2023-02-02-github-actions-updating-the-default-github_token-permissions-to-read-only/
+      contents: write
 
-      - name: Create Temporary Branch
-        run: |
-          git checkout -b update-changelog-${{ github.event.release.name }}
-          echo "BRANCH_NAME=update-changelog-${{ github.event.release.name }}" >> $GITHUB_ENV
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
 
       - name: Update Changelog
         uses: stefanzweifel/changelog-updater-action@v1
         with:
-          release-notes: ${{ github.event.release.body }} # Add release notes to changelog
-          latest-version: ${{ github.event.release.name }} # Add latest version to changelog
+          latest-version: ${{ github.event.release.tag_name }}
+          release-notes: ${{ github.event.release.body }}
 
-      - name: Commit changes
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "GitHub Actions"
-          git add CHANGELOG.md
-          git commit -m "Update Changelog for ${{ github.event.release.name }}"
-
-      - name: Push changes to temporary branch
-        run: |
-          git push origin HEAD:$BRANCH_NAME
-      - name: Create Pull Request
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh pr create \
-            --base main \
-            --head $BRANCH_NAME \
-            --title "Automated Pull Request from $BRANCH_NAME to main" \
-            --body "This is an automated pull request created via GitHub Actions."
+      - name: Commit updated CHANGELOG
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: ${{ github.event.release.target_commitish }}
+          commit_message: Update CHANGELOG
+          file_pattern: CHANGELOG.md

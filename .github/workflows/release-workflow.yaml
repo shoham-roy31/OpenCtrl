@@ -57,6 +57,7 @@ jobs:
       - name: Check Package Version with Tag Version
         run: |
           TAG_VERSION=${{ needs.details.output.new_version }}
+          echo"Version is $TAG_VERSION"
           bash ./check.sh "$TAG_VERSION"
 
       - name: Fetch information from check_pypi

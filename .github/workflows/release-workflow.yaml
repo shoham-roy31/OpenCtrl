@@ -52,10 +52,12 @@ jobs:
       should_build: ${{ steps.docker.outputs.should_build }}
       tag_release: ${{ steps.docker.outputs.tag_release }}
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
       - name: Check Package Version with Tag Version
         run: |
           TAG_VERSION=${{ needs.details.output.new_version }}
-          check.sh TAG_VERSION
+          bash ./check.sh "$TAG_VERSION"
 
       - name: Fetch information from check_pypi
         run: |

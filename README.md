@@ -1,21 +1,21 @@
 # OpenCtrl
 OpenCtrl is an open source library for Control System Dynamics and Optimal Control Alogrithms.
 ## Table of Contents
- -[About OpenCtrl](#about)
- -[Features](#features)
- -[Installation Guide](#installation-guide)
-    -[With Package Manager](#with-package-manager)
-    -[Setup With Docker](#setup-with-docker)
-    -[Clone The Dev Repo](#clone-the-dev-repo)
- -[Quick Guide](#quick-guide)
-    -[Create a Linear System](#create-a-linear-system)
-    -[Create an Optimizer](#create-an-optimizer)
-    -[Use Control Algorithm](#use-control-algorithm)
- -[Contribute](#contribute)
-    -[Repo Setup](#repo-setup)
-    -[Run Test](#run-test)
-    -[Raise a PR](#raise-a-pr)
- -[Author](#author)
+ - [About OpenCtrl](#about)
+ - [Features](#features)
+ - [Installation Guide](#installation-guide)
+    - [With Package Manager](#with-package-manager)
+    - [Setup With Docker](#setup-with-docker)
+    - [Clone The Dev Repo](#clone-the-dev-repo)
+ - [Quick Guide](#quick-guide)
+    - [Create a Linear System](#create-a-linear-system)
+    - [Create an Optimizer](#create-an-optimizer)
+    - [Use Control Algorithm](#use-control-algorithm)
+ - [Contribute](#contribute)
+    - [Repo Setup](#repo-setup)
+    - [Run Test](#run-test)
+    - [Raise a PR](#raise-a-pr)
+ - [Author](#author)
 
 
 ## About
@@ -31,35 +31,35 @@ The library facilitates:
 ## Installation Guide
 
 ### With Package Manager
-Run pip command:
+Run pip command:<br>
 `pip install OpenCtrl`
 
-For specific version *X* use:
-`pip install OpenCtrl=*X*`
+For specific version *X* use:<br>
+`pip install OpenCtrl=X`
 
 ### Setup with Docker
-Run
+Run <br>
 `docker pull gabruroy/openctrl:latest`
 
-For spefic version of DEV
+For spefic version of DEV <br>
 `docker pull gabruroy/openctrl:{version}`
 
 ### Clone The Dev Repo
-Run
+Run <br>
 `https://github.com/shoham-roy31/OpenCtrl.git`
 
-Create a Virtual Env
+Create a Virtual Env<br>
 `python -m venv OpenCtrl`
 
-Install The Dependencies
+Install The Dependencies<br>
 `pip install -r requirements.txt`
 
 
 
 ## Quick Guide
 
-Version Check:
-`python -c "import OpenCtrl print(OpenCtrl.__version__)"`
+Version Check:<br>
+`python -c "import OpenCtrl;print(OpenCtrl.__version__)"`
 
 ### Introduction
 - OpenCtrl currently contains Linear System Dynamics.
@@ -68,7 +68,7 @@ Version Check:
 - Nominal Prediction Modules.
 
 ### Create a Linear System
-This is the beta stage of OpenCtrl, currently provides implementation of *LinearSystem* with *Random*,*Discreet* and *continious* system input and disturbance type of 3 distributions *Normal*, *Uniform* and *Exponential*. 
+This is the beta stage of OpenCtrl, currently provides implementation of *LinearSystem* with *Random*,*Discreet* and *continious* system input and disturbance type of 3 distributions *Normal*, *Uniform* and *Exponential*. <br>
 Example : Load up system parameters you want for your Linear System.
 ```
 import numpy as np
@@ -185,20 +185,21 @@ See the version convention FYI : [Versioning](https://semver.org/spec/v2.0.0.htm
 ### Run Test
 ### 1. Unit Test
 #### With Shellscript
-Run
+Run<br>
 `./entrypoint.sh test`
 #### With Batscript
+Run<br>
 `.\entrypoint.bat test`
 
 ### 2. Integration Test
-Run on the parent dir
+Run on the parent dir<br>
 `pytest`
 
 ### Raise A PR
-3.Commit your changes.
+3.Commit your changes.<br>
 `git commit -m 'Add some feature'`
 
-4. Push to the branch.
+4. Push to the branch.<br>
 `git push origin feature/new-feature`
 
 5. Open a pull request.

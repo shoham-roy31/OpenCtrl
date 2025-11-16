@@ -1,3 +1,4 @@
+![OpenCtrl](OpenCtrlLogo.png)
 # OpenCtrl
 OpenCtrl is an open source library for Control System Dynamics and Optimal Control Alogrithms.
 ## Table of Contents

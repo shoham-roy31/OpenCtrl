@@ -4,4 +4,4 @@ from . import controls
 from . import disturbances_type
 from . import verbose_cli
 
-__version__ = "1.0.12b4"
+__version__ = "1.0.12b5"

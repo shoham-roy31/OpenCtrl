@@ -55,7 +55,6 @@ Install The Dependencies<br>
 `pip install -r requirements.txt`
 
 
-
 ## Quick Guide
 
 Version Check:<br>

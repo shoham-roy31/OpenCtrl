@@ -52,9 +52,14 @@ jobs:
       should_build: ${{ steps.docker.outputs.should_build }}
       tag_release: ${{ steps.docker.outputs.tag_release }}
     steps:
+      - name: Check Package Version with Tag Version
+        run: |
+          TAG_VERSION=${{ needs.details.output.new_version }}
+          ./check.sh TAG_VERSION
+
       - name: Fetch information from check_pypi
         run: |
-          response=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json || echo "{}")
+          response=$(curl -s https://test.pypi.org/pypi/${{ env.PACKAGE_NAME }}/json || echo "{}")
           latest_previous_version=$(echo $response | grep -oP '"releases":\{"\K[^"]+' | sort -rV | head -n 1)
           if [ -z "$latest_previous_version" ]; then
             echo "Package not found on PyPI."
@@ -108,14 +113,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch full history to avoid issues with tags and branches
-
-      # - name: Download artifacts
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: dist
-      #     path: dist/
-
+          fetch-depth: 0 
       - name: Create GitHub Release
         id: create_release
         run: gh release create ${{ env.TAG_NAME }} --title ${{ env.TAG_NAME }} --generate-notes

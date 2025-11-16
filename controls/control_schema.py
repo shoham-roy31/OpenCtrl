@@ -1,6 +1,6 @@
-from optim.optimizer_schema import OptimizerSchema
-from SystemDynamicExample.base_sys import BaseSystem
-from disturbances_type.functionals import (baseline_disturbance,
+from ..optim.optimizer_schema import OptimizerSchema
+from ..SystemDynamicExample.base_sys import BaseSystem
+from ..disturbances_type.functionals import (baseline_disturbance,
                                            meanbasline_disturbance,
                                            ema_disturbance) 
 from typing import Literal,Optional,List

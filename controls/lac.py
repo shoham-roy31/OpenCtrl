@@ -1,8 +1,8 @@
 import numpy as np
 from .control_schema import ControlSchema
-from verbose_cli.cli import make_table
-from optim.optimizer_schema import OptimizerSchema
-from SystemDynamicExample.base_sys import BaseSystem
+from ..verbose_cli.cli import make_table
+from ..optim.optimizer_schema import OptimizerSchema
+from ..SystemDynamicExample.base_sys import BaseSystem
 from typing import List, Tuple,Optional,Literal
 
 def assert_params(**args):

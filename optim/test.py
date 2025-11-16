@@ -1,7 +1,7 @@
 import numpy as np
 from .vanilla_optim import VanillaOptim
 from .optimizer_schema import OptimizerSchema
-from SystemDynamicExample.linear_sys import LinearSystem
+from ..SystemDynamicExample.linear_sys import LinearSystem
 
 def test_optimizer_schema():
     try:

@@ -1,15 +1,15 @@
 import pytest
 from typing import Callable
-from controls.test import _test_lac_1
-from optim.test import (
+from ..controls.test import _test_lac_1
+from ..optim.test import (
     test_optimizer_schema,
     test_vanilla_optim,
 )
-from SystemDynamicExample.test import (
+from ..SystemDynamicExample.test import (
     test_base_system_initialization,
     test_linear_system_initialization
 )
-from disturbances_type.test import _test_all
+from ..disturbances_type.test import _test_all
 
 def call(obj : Callable):
     if isinstance(obj, list):

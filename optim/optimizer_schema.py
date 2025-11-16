@@ -1,5 +1,5 @@
 import inspect
-from SystemDynamicExample.base_sys import BaseSystem
+from ..SystemDynamicExample.base_sys import BaseSystem
 from typing import Literal, Optional, Dict, Callable, Union
 
 def assert_inputs(**args) -> None:

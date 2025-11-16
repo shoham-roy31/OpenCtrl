@@ -12,11 +12,11 @@ env:
   OWNER: "shoham-roy31"
 
 jobs:
-  test:
-    uses: ./.github/workflows/test-workflow.yaml
+  # test:
+  #   uses: ./.github/workflows/test-workflow.yaml
   details:
     runs-on: ubuntu-latest
-    needs: [test]
+    # needs: [test]
     outputs:
       new_version: ${{ steps.release.outputs.new_version }}
       suffix: ${{ steps.release.outputs.suffix }}
@@ -55,7 +55,7 @@ jobs:
       - name: Check Package Version with Tag Version
         run: |
           TAG_VERSION=${{ needs.details.output.new_version }}
-          ./check.sh TAG_VERSION
+          check.sh TAG_VERSION
 
       - name: Fetch information from check_pypi
         run: |

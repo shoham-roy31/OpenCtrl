@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List,Optional
-from ..SystemDynamicExample.base_sys import BaseSystem
+from OpenCtrl.SystemDynamicExample.base_sys import BaseSystem
 def assert_params(**args):
     def _check_prevs(key : str) -> None:
         if not isinstance(args[key],np.ndarray):

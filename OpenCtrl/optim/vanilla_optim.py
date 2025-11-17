@@ -2,8 +2,8 @@ import inspect
 import numpy as np
 import matplotlib.pyplot as plt
 from .optimizer_schema import OptimizerSchema
-from ..SystemDynamicExample.base_sys import BaseSystem
-from ..SystemDynamicExample.schemas import InputSpace
+from OpenCtrl.SystemDynamicExample.base_sys import BaseSystem
+from OpenCtrl.SystemDynamicExample.schemas import InputSpace
 from typing import Literal, Dict, Callable, Optional, List, Tuple, Union
 
 def assert_params(**args):

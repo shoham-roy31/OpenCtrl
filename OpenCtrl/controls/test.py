@@ -1,6 +1,6 @@
 import numpy as np
-from ..SystemDynamicExample.linear_sys import LinearSystem
-from ..optim.vanilla_optim import VanillaOptim
+from OpenCtrl.SystemDynamicExample.linear_sys import LinearSystem
+from OpenCtrl.optim.vanilla_optim import VanillaOptim
 from .lac import LAC
 
 def _test_lac_1() -> None:

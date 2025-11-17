@@ -3,7 +3,7 @@ from typing import Optional,List
 from .functionals import (baseline_disturbance,
                           meanbasline_disturbance,
                           ema_disturbance)
-from ..SystemDynamicExample.linear_sys import LinearSystem
+from OpenCtrl.SystemDynamicExample.linear_sys import LinearSystem
 def _test_all(  horizon: Optional[int] = 2,
                 disturbance_dim : Optional[int] = 3,
                 window : Optional[List[np.ndarray]] = [np.array([1.0,1.0,3.0]),

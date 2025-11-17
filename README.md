@@ -153,6 +153,7 @@ cost_genetic,u_genetic = optimizer_genetic.optimizer( pred = get_predictios( hor
 verbose = True )
 print_metrics('genetic',cost_genetic,u_genetic)
 ```
+![OptimPlot](optim_plot.gif)
 ### Use Control Algorithm
 The only control algorithm OpenCtrl has right now is *Learning Augmented Control (LAC)* with *Delayed Confidence Learning (DCL)*. **LAC** tunes the system parameters in a competitive ratio of MPC based on data driven Machine Learning and feedback control or nominal standard of tuning. This control algorithm ensures the system sustains near-optimal performance when there are adverserial predictions from Machine Learning models, then the competitive ratio shift towards conventional predictions or feedback inputs, otherwise if the data driven predictions have promising predctions the confidence shift towards it. **LAC** can be relied when the demand is for robust and safe performance. [REFERENCE](https://arxiv.org/pdf/2507.14595)
 
@@ -172,6 +173,7 @@ for _ in range(control_horizon):
                      )
     print_metrics('genetic',cost, u )
 ```
+![ControlMetrics](control_metrics.gif)
 ## Contribute
 ### Repo Setup
 1. Fork the project.

@@ -56,6 +56,7 @@ def test_vanilla_optim():
                                  population_size= 1000,
                                  max_iterations = 1000,
                                  tolerance = 2.1,
+                                 threshold= 0.5,
                                  tolerance_step = 50,
                                  constraints = None)
         print("3. ✅ VanillaOptim test passed")

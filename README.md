@@ -182,7 +182,7 @@ for _ in range(control_horizon):
 `git checkout -b feature/new-feature`
 
 ### Increment The Version
-Increment the package version in __init__.py -> __version__
+Increment the package version in OpenCtrl.__init__.py -> __version__
 See the version convention FYI : [Versioning](https://semver.org/spec/v2.0.0.html)
 ### Run Test
 ### 1. Unit Test

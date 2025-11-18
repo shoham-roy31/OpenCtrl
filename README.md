@@ -73,27 +73,28 @@ Example : Load up system parameters you want for your Linear System.
 ```
 import numpy as np
 from OpenCtrl.SystemDynamicExample import LinearSystem
- ''' define your input space parameters '''
-input_space = { '1' : {'discreet' : [0,512]},
-                '2' : {'random' : ['unifrom',-128,127]},
-                '3' : {'continious' : [-10,10]},
-                '3' : {'continious' : [512,1024]},
+''' define your input space parameters '''
+input_space = { '1' : {'discrete' : [0,512]},
+                '2' : {'random' : ['uniform',-128,127]},
+                '3' : {'continuous' : [-10,10]},
+                '4' : {'continuous' : [512,1024]},
               }
- ''' Instantiate Linear System Object '''
+''' Instantiate Linear System Object '''
 linear_sys = LinearSystem(sys_dim = 4,
                           input_dim = 4,
                           input_space = input_space,
                           disturbance_type = 'uniform',
                           disturbance_scale = [-255, 255],
-                          disturbance_params = full
+                          disturbance_params = None
                           )
-''' Info : sys_dim equals input_dim since we considered we can control 4 degrees of freedom, if the case is different like we have 1 degree of freedom then input_space can only have { '1' : {'discreet' : [0,512] } } only. For disturbance_params some degree of freedom can have no impact by disturbance if only 1 degree is impacted the disturbance_params will be 1. '''
-u = np.array( [np.random.random(0,512).item(), 
-              np.random.uniform(-128,127).item(), 
-              np.random.uniform(-10,10).item(), 
-              np.random.unifrom(512,1024).item()]
+''' Info : sys_dim equals input_dim since we considered we can control 4 degrees of freedom, if the case is different like we have 1 degree of freedom then input_space can only have { '1' : {'discrete' : [0,512] } } only. For disturbance_params some degree of freedom can have no impact by disturbance if only 1 degree is impacted the disturbance_params will be 1. '''
+u_o = np.array([np.random.randint(0,512), 
+              np.random.uniform(-128,127), 
+              np.random.uniform(-10,10), 
+              np.random.uniform(512,1024)]
             )
-print(linear_sys.step(u))
+linear_sys.step(u_o)
+print(linear_sys.x)
 ```
 ### Create an Optimizer
 Currently it is equiped with Vanilla Optimizer Module, with zoo of optimizer engines like *Random Search*, *Gradient Descent* and *Genetic Alogrithm* will facilitate to dervie optimal system input params based on system dynamics with *Multi Horizon* cost estimation.
@@ -108,7 +109,7 @@ max_iteration = 50
 tolerance_step = 10
 
 def get_predictions(horizon):
-    return [u for _ in range(horizon)]
+    return [u_o for _ in range(horizon)]
 
 def print_metrics(type,cost,u):
     print(f"For optimizer type {type} \nCost: {cost}\nOptimal Input : {u}")
@@ -117,14 +118,15 @@ def print_metrics(type,cost,u):
 optimizer_random = VanillaOptim( system = linear_sys,
                                  horizon = horizon,
                                  cost_function = cost_func,
-                                 optimizer_type = 'random'
+                                 optimizer_type = 'random',
                                  max_iterations = max_iteration,
                                  tolerance_step = tolerance_step
                                 )
-cost_random, u_random = optimizer_random.optimizer( preds = get_predictions(horizon),
+cost_random, u_random = optimizer_random.optimize( preds = get_predictions(horizon),
                                                     verbose = True
                                                   )
-print_metrics('random',cost_random,u_random)        
+print_metrics('random',cost_random,u_random)     
+       
 ''' Gradient Descent '''
 optimizer_gradient = VanillaOptim( system = linear_sys,
                                    horizon = 5,
@@ -134,7 +136,7 @@ optimizer_gradient = VanillaOptim( system = linear_sys,
                                    max_iterations = max_iteration,
                                    tolerance_step = tolerance_step
                                 )
-cost_gradient,u_gradient = optimizer_gradient.optimize( preds = get_predictions  (horizon),
+cost_gradient,u_gradient = optimizer_gradient.optimize(preds = get_predictions(horizon),
 verbose = True )
 print_metrics('gradient',cost_gradient,u_gradient)
 ''' Genetic Algorithm '''
@@ -149,8 +151,8 @@ optimizer_genetic = VanillaOptim( system = linear_sys,
                                   max_iterations = max_iteration,
                                   tolerance_step = tolerance_step
                                   )
-cost_genetic,u_genetic = optimizer_genetic.optimizer( pred = get_predictios( horizon),
-verbose = True )
+cost_genetic,u_genetic = optimizer_genetic.optimize(pred = get_predictios(horizon),
+verbose = True)
 print_metrics('genetic',cost_genetic,u_genetic)
 ```
 ![OptimPlot](optim_plot.gif)
@@ -162,16 +164,18 @@ Example : Loading up LAC in the linear_sys
 from OpenCtrl.controls import LAC
 control_horizon = 10
 lac = LAC(system = linear_sys,
-          optimizer = optimizer_genetic,
+          optimizer = optimizer_gradient,
           horizon = horizon,
-          nominal_disturbance = 'mean_baseline'
+          nominal_disturbance = 'baseline'
           )
 ''' nominal_disturbance is a conventional method of predicting disturbance '''
 for _ in range(control_horizon):
-    cost,u = lac.tune(preds = get_predictions(horzion),
-                      verbose = True
+    preds = get_predictions(horizon)
+    cost,u = lac.tune(preds = preds,
+                      verbose = True,
+                      base_line= _
                      )
-    print_metrics('genetic',cost, u )
+    print_metrics('gradient',cost, u)
 ```
 ![ControlMetrics](control_metrics.gif)
 ## Contribute

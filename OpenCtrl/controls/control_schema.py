@@ -43,22 +43,19 @@ class ControlSchema:
     
     def _wrapper_disturbance(self,
                              horizon : int,
-                             disturbance_dim : int,
+                             window_size : int,
                              window : int,
                              prev_ema : List[float],
                              prev_real : List[float],
                              alpha : Optional[float] = 0.01
                              ) -> callable:
-        if self.nominal_disturbance.lower() == 'baseline':
-            return baseline_disturbance(horizon,
-                                        disturbance_dim)
-        elif self.nominal_disturbance.lower() == 'mean_baseline':
+        if self.nominal_disturbance.lower() == 'mean_baseline':
             return meanbasline_disturbance(horizon,
                                            window,
-                                           disturbance_dim)
+                                           window_size)
         elif self.nominal_disturbance.lower() == 'ema':
             return ema_disturbance(horizon,
                                    prev_ema,
                                    prev_real,
-                                   disturbance_dim,
+                                   window_size,
                                    alpha = alpha if not 0.01 else 0.01)

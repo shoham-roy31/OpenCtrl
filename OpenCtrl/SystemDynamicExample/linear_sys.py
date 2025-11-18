@@ -106,7 +106,7 @@ class LinearSystem(BaseSystem):
                     self.u.append(InputSpaceContinuous(min_value = v[0], max_value = v[1]))
                 elif k == 'random':
                     if len(v) == 3 and isinstance(v[0], str) and isinstance(v[1], (int, float)) and isinstance(v[2], (int, float)):
-                        self.u.append(InputSpaceRandom(sampling = v[0], min_value = v[0], max_value = v[1]))
+                        self.u.append(InputSpaceRandom(sampling = v[0], min_value = v[1], max_value = v[2]))
                     elif len(v) == 2:
                         if isinstance(v[0], str) or isinstance(v[1], str):
                             raise ValueError(f"input_space['random'] if it has 2 values, then first value must be min and second value must be max but got {v}")

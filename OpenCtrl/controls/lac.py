@@ -2,6 +2,7 @@ import numpy as np
 from .control_schema import ControlSchema
 from OpenCtrl.verbose_cli.cli import make_table
 from OpenCtrl.optim.optimizer_schema import OptimizerSchema
+from OpenCtrl.disturbances_type import baseline_disturbance
 from OpenCtrl.SystemDynamicExample.base_sys import BaseSystem
 from typing import List, Tuple,Optional,Literal
 
@@ -73,6 +74,8 @@ class LAC(ControlSchema):
         self.rho = rho
         self.beta = beta
         self.window = None
+        self.prev_ema = np.zeros(self.system.sys_dim)
+        self.prev_real = np.zeros(self.system.sys_dim)
     def tune(self,
              preds: List[np.ndarray],
              manual_nominals : Optional[List[np.ndarray]] = None,
@@ -81,7 +84,8 @@ class LAC(ControlSchema):
              window_size : Optional[int] = 3,
              manual_window : Optional[List[np.ndarray]] = None,
              alpha_ema : Optional[float] = 0.01,
-             verbose : Optional[bool] = False
+             verbose : Optional[bool] = False,
+             base_line : Optional[float] = 0.1
              ) -> Tuple[np.ndarray]:
         assert_params(**locals())
         if not len(preds) == self.horizon:
@@ -94,24 +98,25 @@ class LAC(ControlSchema):
             if not all(len(_) == self.system.sys_dim for _ in manual_nominals):
                 raise ValueError(f"dimension of elements in manual_nominals are incorrect should system disturbance_dim : {self.system.sys_dim}")
         blended = []
-        if not self.window:
-            self.window = [np.array([window_init for _ in range(self.system.sys_dim)]) for _ in range(window_size)] \
-                 if window_auto else manual_window
-        self.prev_ema = np.zeros(self.system.sys_dim)
-        self.prev_real = np.zeros(self.system.sys_dim)
-        self.nominal = self._wrapper_disturbance(self.horizon,
-                                            self.system.disturbance_dim,
-                                            self.window,
-                                            self.prev_ema,
-                                            self.prev_real,
-                                            alpha_ema) if not manual_nominals \
-                                            else manual_nominals
+        if self.nominal_disturbance.lower() == 'baseline':
+            self.nominal = baseline_disturbance(self.horizon,self.system.sys_dim,base_line)
+        else:
+            if not self.window:
+                self.window = [np.array([window_init for _ in range(self.system.sys_dim)]) for _ in range(window_size)] \
+                    if window_auto else manual_window
+            self.nominal = self._wrapper_disturbance(self.horizon,
+                                                window_size,
+                                                self.window,
+                                                self.prev_ema,
+                                                self.prev_real,
+                                                alpha_ema) if not manual_nominals \
+                                                else manual_nominals
+            
         self.counter += 1
         if self.counter >= self.warmup_steps:
             self.dcl()
             self.error_queue.pop()
             self.counter = 0
-        
         for _ in range(self.horizon):
             blended.append(self.psi*preds[_] + (1 - self.psi)*self.nominal[_])
         cost,u = self.optim.optimize(blended,
@@ -119,10 +124,11 @@ class LAC(ControlSchema):
         self.system.step(u[0])
         self.error_queue.append([[self.system.phi - preds[0]],
                                 [self.system.phi - self.nominal[0]]])
-        self.prev_ema = self.nominal[-1]
-        self.prev_real = self.system.phi
-        self.window.pop(0)
-        self.window.append(self.system.phi)
+        if self.nominal_disturbance != 'baseline':
+            self.prev_ema = self.nominal[-1]
+            self.prev_real = self.system.phi
+            self.window.pop(0)
+            self.window.append(self.system.phi)
         if verbose:
             display_stack = [[np.round(inp,3),np.round(c,3),np.round(b,3),np.round(n,3),np.round(self.psi,4)] for inp, c, 
                              b,n in zip(u,cost,blended, self.nominal)]
@@ -143,7 +149,7 @@ class LAC(ControlSchema):
               eNo:np.array
               ) -> np.array:
             T = np.arange(start= 0,
-                          stop= self.counter) * np.ones_like(eMl)
+                          stop= self.system.sys_dim) * np.ones_like(eMl)
             return self.rho * T * (self.psi * delta(eMl,eNo) + eNo)
         eMl = np.array([e for e_ in self.error_queue for e in e_[0]])
         eNo = np.array([e for e_ in self.error_queue for e in e_[1]])

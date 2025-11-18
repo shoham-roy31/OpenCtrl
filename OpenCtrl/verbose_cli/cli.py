@@ -12,7 +12,6 @@ def make_table(headers : List,
     headers: list of header strings (one per column)
     rows: list of rows, each row is a list of cells (same length as headers)
     padding: spaces left/right inside each cell
-
     Thanks to GPT
     """
     # Normalize rows: each cell -> list of lines
